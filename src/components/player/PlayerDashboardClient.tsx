@@ -94,15 +94,19 @@ export function PlayerDashboardClient({
           <p className="text-xs text-[var(--color-muted)]">Total Paid</p>
           <p className="text-xl font-bold text-[var(--color-paid)] number-display">{formatNPR(totalPaid)}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4">
-          <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center mb-2">
-            <Scale size={17} className="text-[var(--color-primary)]" />
+        <Link href="/player/team" className="bg-white rounded-2xl border border-[var(--color-border)] p-4 block active:bg-[var(--color-surface-alt)] transition-colors">
+          <div className="flex items-start justify-between mb-2">
+            <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center">
+              <Scale size={17} className="text-[var(--color-primary)]" />
+            </div>
+            <ChevronRight size={14} className="text-[var(--color-muted)] mt-1" />
           </div>
           <p className="text-xs text-[var(--color-muted)]">Team Balance</p>
           <p className={`text-xl font-bold number-display ${teamBalance >= 0 ? 'text-[var(--color-primary)]' : 'text-[var(--color-unpaid)]'}`}>
             {formatNPR(teamBalance)}
           </p>
-        </div>
+          <p className="text-[10px] text-[var(--color-muted)] mt-1">Tap to see who paid</p>
+        </Link>
       </div>
 
       {/* Recent payments */}
