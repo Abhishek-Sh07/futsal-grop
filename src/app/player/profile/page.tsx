@@ -11,10 +11,12 @@ export default async function PlayerProfilePage() {
   const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
   const { data: player } = await supabase.from('players').select('*').eq('email', profile?.email || '').single();
 
-  const [{ data: stats }, { data: contribution }, { data: payments }] = await Promise.all([
+  const [{ data: stats }, { data: contribution }, { data: payments }, { data: playerProfile }, { data: teamSettings }] = await Promise.all([
     supabase.from('player_stats').select('*').eq('player_id', player?.id || '').single(),
     supabase.from('player_contribution').select('*').eq('player_id', player?.id || '').single(),
     supabase.from('payments').select('status').eq('player_id', player?.id || ''),
+    supabase.from('player_profiles').select('*').eq('player_id', player?.id || '').single(),
+    supabase.from('team_settings').select('*').limit(1).single(),
   ]);
 
   return (
@@ -26,6 +28,8 @@ export default async function PlayerProfilePage() {
         stats={stats}
         contribution={contribution}
         payments={payments ?? []}
+        playerProfile={playerProfile}
+        teamSettings={teamSettings}
       />
     </>
   );

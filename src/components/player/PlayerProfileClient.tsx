@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Profile, Player, PlayerStats, PlayerContribution } from '@/types';
+import { Profile, Player, PlayerStats, PlayerContribution, PlayerProfile, TeamSettings } from '@/types';
 import { formatNPR, formatDate } from '@/lib/utils/format';
 import { calculateRating, calculatePaymentReliability } from '@/lib/utils/rating';
-import { PlayerCard, RatingBreakdownCard, PaymentReliabilityCard } from '@/components/ui/PlayerCard';
+import { RatingBreakdownCard, PaymentReliabilityCard } from '@/components/ui/PlayerCard';
+import { DynamicPlayerCard } from '@/components/ui/DynamicPlayerCard';
 import { toast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
 import { Phone, Mail, Calendar, Wallet, LogOut } from 'lucide-react';
@@ -27,9 +28,11 @@ interface Props {
   stats: PlayerStats | null;
   contribution: PlayerContribution | null;
   payments: Array<{ status: string }>;
+  playerProfile: PlayerProfile | null;
+  teamSettings: TeamSettings | null;
 }
 
-export function PlayerProfileClient({ profile, player, stats, contribution, payments }: Props) {
+export function PlayerProfileClient({ profile, player, stats, contribution, payments, playerProfile, teamSettings }: Props) {
   const router = useRouter();
 
   const s = stats ?? DEFAULT_STATS;
@@ -46,10 +49,12 @@ export function PlayerProfileClient({ profile, player, stats, contribution, paym
 
   return (
     <div className="px-4 pt-4 pb-24 space-y-4">
-      {/* Player rating card */}
+      {/* Dynamic player card */}
       {player && (
-        <PlayerCard
-          name={player.full_name || profile?.full_name || 'Player'}
+        <DynamicPlayerCard
+          player={player}
+          profile={playerProfile}
+          team={teamSettings}
           rating={rating}
           stats={{
             matches: s.matches_played,
@@ -60,13 +65,15 @@ export function PlayerProfileClient({ profile, player, stats, contribution, paym
             cleanSheets: s.clean_sheets,
             saves: s.saves,
           }}
+          variant="full"
+          showActions
         />
       )}
 
       {/* Rating breakdown */}
       <RatingBreakdownCard rating={rating} />
 
-      {/* Payment reliability (own view) */}
+      {/* Payment reliability */}
       <PaymentReliabilityCard
         percentage={reliability.percentage}
         label={reliability.label}

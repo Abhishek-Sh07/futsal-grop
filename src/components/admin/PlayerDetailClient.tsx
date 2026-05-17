@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Player, Payment, PlayerStats, PlayerContribution, MONTHS } from '@/types';
+import { Player, Payment, PlayerStats, PlayerContribution, PlayerProfile, TeamSettings, MONTHS } from '@/types';
 import { formatNPR, formatDate, cn } from '@/lib/utils/format';
 import { calculateRating, calculatePaymentReliability } from '@/lib/utils/rating';
 import { PaymentBadge } from '@/components/ui/Badge';
 import { Card, StatCard } from '@/components/ui/Card';
-import { PlayerCard, RatingBreakdownCard, PaymentReliabilityCard } from '@/components/ui/PlayerCard';
+import { RatingBreakdownCard, PaymentReliabilityCard } from '@/components/ui/PlayerCard';
+import { DynamicPlayerCard } from '@/components/ui/DynamicPlayerCard';
 import { PlayerStatsEditor } from '@/components/admin/PlayerStatsEditor';
+import { PlayerProfileEditor } from '@/components/admin/PlayerProfileEditor';
 import { Phone, Mail, Calendar, Wallet, TrendingUp, AlertCircle } from 'lucide-react';
 
 interface Props {
@@ -17,9 +19,11 @@ interface Props {
   totalPending: number;
   stats: PlayerStats | null;
   contribution: PlayerContribution | null;
+  playerProfile: PlayerProfile | null;
+  teamSettings: TeamSettings | null;
 }
 
-type Tab = 'overview' | 'rating';
+type Tab = 'overview' | 'rating' | 'card';
 
 const DEFAULT_STATS: PlayerStats = {
   id: '', player_id: '', matches_played: 0, goals: 0, assists: 0, wins: 0,
@@ -34,25 +38,36 @@ const DEFAULT_CONTRIB: PlayerContribution = {
   captain_points: 0, updated_by: null, updated_at: '',
 };
 
-export function PlayerDetailClient({ player, payments, totalPaid, totalPending, stats, contribution }: Props) {
+export function PlayerDetailClient({ player, payments, totalPaid, totalPending, stats, contribution, playerProfile, teamSettings }: Props) {
   const [tab, setTab] = useState<Tab>('overview');
+  const [currentProfile, setCurrentProfile] = useState<PlayerProfile | null>(playerProfile);
 
   const s = stats ?? DEFAULT_STATS;
   const c = contribution ?? DEFAULT_CONTRIB;
   const rating = calculateRating(s, c);
   const reliability = calculatePaymentReliability(payments);
 
+  const cardStats = {
+    matches: s.matches_played,
+    goals: s.goals,
+    assists: s.assists,
+    attendance: s.attendance_percentage,
+    isGoalkeeper: s.is_goalkeeper,
+    cleanSheets: s.clean_sheets,
+    saves: s.saves,
+  };
+
   return (
     <div className="px-4 pt-4 pb-24 space-y-4">
       {/* Tab bar */}
       <div className="flex gap-1 bg-[var(--color-surface-alt)] p-1 rounded-xl">
-        {(['overview', 'rating'] as Tab[]).map(t => (
+        {(['overview', 'rating', 'card'] as Tab[]).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={cn(
               'flex-1 py-2 rounded-lg text-sm font-semibold capitalize transition-all',
               tab === t ? 'bg-white text-[var(--color-primary)] shadow-sm' : 'text-[var(--color-muted)]'
             )}>
-            {t === 'rating' ? 'Rating & Stats' : 'Overview'}
+            {t === 'rating' ? 'Rating' : t === 'card' ? 'Player Card' : 'Overview'}
           </button>
         ))}
       </div>
@@ -93,7 +108,6 @@ export function PlayerDetailClient({ player, payments, totalPaid, totalPending, 
             <StatCard label="Total Pending" value={formatNPR(totalPending)} icon={<AlertCircle size={18} />} accentColor={totalPending > 0 ? 'var(--color-unpaid)' : 'var(--color-muted)'} />
           </div>
 
-          {/* Payment reliability (admin can always see) */}
           <PaymentReliabilityCard
             percentage={reliability.percentage}
             label={reliability.label}
@@ -141,28 +155,32 @@ export function PlayerDetailClient({ player, payments, totalPaid, totalPending, 
 
       {tab === 'rating' && (
         <>
-          {/* Player card */}
-          <PlayerCard
-            name={player.full_name}
-            rating={rating}
-            stats={{
-              matches: s.matches_played,
-              goals: s.goals,
-              assists: s.assists,
-              attendance: s.attendance_percentage,
-              isGoalkeeper: s.is_goalkeeper,
-              cleanSheets: s.clean_sheets,
-              saves: s.saves,
-            }}
-          />
-
-          {/* Rating breakdown */}
           <RatingBreakdownCard rating={rating} />
-
-          {/* Stats editor */}
           <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4">
             <p className="text-sm font-bold text-[var(--color-charcoal)] mb-4">Edit Stats</p>
             <PlayerStatsEditor playerId={player.id} stats={s} contribution={c} />
+          </div>
+        </>
+      )}
+
+      {tab === 'card' && (
+        <>
+          <DynamicPlayerCard
+            player={player}
+            profile={currentProfile}
+            team={teamSettings}
+            rating={rating}
+            stats={cardStats}
+            variant="full"
+            showActions
+          />
+          <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4">
+            <p className="text-sm font-bold text-[var(--color-charcoal)] mb-4">Edit Card Profile</p>
+            <PlayerProfileEditor
+              playerId={player.id}
+              profile={currentProfile}
+              onUpdate={setCurrentProfile}
+            />
           </div>
         </>
       )}

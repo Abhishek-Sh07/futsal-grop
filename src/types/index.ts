@@ -220,3 +220,27 @@ export interface FormationPlayer {
   position_x: number | null;
   position_y: number | null;
 }
+
+export interface PlayerProfile {
+  id: string;
+  player_id: string;
+  nickname: string | null;
+  photo_url: string | null;
+  jersey_number: string | null;
+  preferred_position: string | null;
+  secondary_position: string | null;
+  strong_foot: 'Right' | 'Left' | 'Both';
+  playing_style: string | null;
+  updated_at: string;
+}
+
+export interface TeamSettings {
+  id: string;
+  team_name: string;
+  logo_url: string | null;
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  created_at: string;
+  updated_at: string;
+}
