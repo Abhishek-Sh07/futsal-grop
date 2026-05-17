@@ -11,8 +11,9 @@ import { Input, Select, TextArea } from '@/components/ui/Input';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { toast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
 import {
-  Search, Plus, Phone, Mail, Filter, UserMinus, UserCheck,
+  Search, Plus, Phone, UserMinus, UserCheck,
   ChevronRight, User
 } from 'lucide-react';
 import Link from 'next/link';
@@ -27,6 +28,7 @@ type PaymentRecord = {
 interface Props {
   players: Player[];
   paymentMap: Map<string, PaymentRecord>;
+  photoMap: Map<string, string>;
   month: number;
   year: number;
 }
@@ -38,7 +40,7 @@ const INITIAL_FORM = {
   status: 'active' as PlayerStatus, joined_date: new Date().toISOString().split('T')[0], notes: '',
 };
 
-export function PlayersClient({ players, paymentMap, month, year }: Props) {
+export function PlayersClient({ players, paymentMap, photoMap, month, year }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterStatus>('all');
@@ -190,6 +192,7 @@ export function PlayersClient({ players, paymentMap, month, year }: Props) {
         <div className="space-y-2 pb-2">
           {filtered.map(player => {
             const payment = paymentMap.get(player.id);
+            const photo = photoMap.get(player.id);
             const isInactive = player.status === 'inactive';
             return (
               <div
@@ -201,10 +204,14 @@ export function PlayersClient({ players, paymentMap, month, year }: Props) {
               >
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
-                  <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-[var(--color-primary)]">
-                      {player.full_name.charAt(0)}
-                    </span>
+                  <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+                    {photo ? (
+                      <Image src={photo} alt={player.full_name} fill className="object-cover object-top" />
+                    ) : (
+                      <span className="text-sm font-bold text-[var(--color-primary)]">
+                        {player.full_name.charAt(0)}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
