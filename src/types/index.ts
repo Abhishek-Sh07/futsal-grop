@@ -145,6 +145,60 @@ export const PAYMENT_METHODS: Record<PaymentMethod, string> = {
   other: 'Other',
 };
 
+export interface PlayerStats {
+  id: string;
+  player_id: string;
+  matches_played: number;
+  goals: number;
+  assists: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  mvp_count: number;
+  yellow_cards: number;
+  red_cards: number;
+  attendance_percentage: number;
+  clean_sheets: number;
+  saves: number;
+  goals_conceded: number;
+  late_cancellations: number;
+  no_shows: number;
+  is_goalkeeper: boolean;
+  updated_at: string;
+}
+
+export interface PlayerContribution {
+  id: string;
+  player_id: string;
+  availability_response_points: number;
+  assigned_position_points: number;
+  versatility_points: number;
+  substitute_points: number;
+  organization_points: number;
+  captain_points: number;
+  updated_by: string | null;
+  updated_at: string;
+}
+
+export interface RatingBreakdown {
+  performanceScore: number;
+  attendanceScore: number;
+  contributionScore: number;
+  disciplineScore: number;
+  finalRating: number;
+  ratingLabel: string;
+  isNewPlayer: boolean;
+}
+
+export interface PaymentReliability {
+  percentage: number;
+  label: string;
+  totalMonths: number;
+  paidMonths: number;
+  partialMonths: number;
+  unpaidMonths: number;
+}
+
 export type MatchType = '5v5' | '7v7';
 export type PlayerRole = 'starter' | 'substitute' | 'unavailable';
 

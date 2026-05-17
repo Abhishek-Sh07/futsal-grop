@@ -9,9 +9,11 @@ export default async function PlayerDetailPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: player }, { data: payments }] = await Promise.all([
+  const [{ data: player }, { data: payments }, { data: stats }, { data: contribution }] = await Promise.all([
     supabase.from('players').select('*').eq('id', id).single(),
     supabase.from('payments').select('*').eq('player_id', id).order('year', { ascending: false }).order('month', { ascending: false }),
+    supabase.from('player_stats').select('*').eq('player_id', id).single(),
+    supabase.from('player_contribution').select('*').eq('player_id', id).single(),
   ]);
 
   if (!player) notFound();
@@ -30,7 +32,14 @@ export default async function PlayerDetailPage({ params }: { params: Promise<{ i
           </Link>
         }
       />
-      <PlayerDetailClient player={player} payments={payments || []} totalPaid={totalPaid} totalPending={totalPending} />
+      <PlayerDetailClient
+        player={player}
+        payments={payments || []}
+        totalPaid={totalPaid}
+        totalPending={totalPending}
+        stats={stats}
+        contribution={contribution}
+      />
     </>
   );
 }
