@@ -123,7 +123,7 @@ export function PlayersClient({ players, paymentMap, month, year }: Props) {
     { key: 'inactive', label: 'Inactive' },
   ];
 
-  const PlayerForm = () => (
+  const playerFormJsx = (
     <div className="space-y-4">
       <Input label="Full Name *" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Ram Bahadur Thapa" />
       <Input label="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="98XXXXXXXX" type="tel" />
@@ -277,12 +277,12 @@ export function PlayersClient({ players, paymentMap, month, year }: Props) {
 
       {/* Add Player Modal */}
       <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add New Player">
-        <PlayerForm />
+        {playerFormJsx}
       </Modal>
 
       {/* Edit Player Modal */}
       <Modal open={!!editPlayer} onClose={() => setEditPlayer(null)} title="Edit Player">
-        <PlayerForm />
+        {playerFormJsx}
       </Modal>
 
       {/* Deactivate confirm */}
