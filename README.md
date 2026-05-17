@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Futsal Hisab ⚽
 
-## Getting Started
+A modern mobile-first Progressive Web App (PWA) for tracking your futsal team's monthly contributions, expenses, and balance.
 
-First, run the development server:
+## Features
+
+### Admin / Treasurer
+- Dashboard with real-time collection progress
+- Player management (add, edit, deactivate)
+- Monthly payment tracking (Paid / Unpaid / Partial / Overpaid)
+- Expense tracking with category breakdown
+- Reports with CSV export
+- WhatsApp reminder messages
+- Announcements for the team
+
+### Player
+- Personal payment status dashboard
+- Full payment history
+- Team fund summary
+- Announcements from admin
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router) + TypeScript
+- **Styling**: Tailwind CSS v4
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **Type**: Progressive Web App (PWA)
+- **Currency**: NPR (Nepali Rupee)
+
+## Quick Start
+
+### 1. Clone and install
+
+```bash
+cd futsal-hisab
+npm install
+```
+
+### 2. Set up Supabase
+
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Go to **SQL Editor** → Run `supabase/schema.sql`
+3. Then run `supabase/seed.sql` for demo data
+
+### 3. Configure environment
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Find these in Supabase → Settings → API.
+
+### 4. Create Admin User
+
+1. In Supabase → Authentication → Users → **Add User**
+2. Enter email and password for the admin
+3. The user profile is auto-created as `player` role
+4. To make them admin, run in SQL editor:
+   ```sql
+   UPDATE public.profiles SET role = 'admin' WHERE email = 'admin@yourteam.com';
+   ```
+
+### 5. Run the app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Install as PWA
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Open the app in Chrome/Safari on mobile
+2. Tap the browser menu → **Add to Home Screen**
+3. Tap **Add** — the app installs like a native app
 
-## Learn More
+Or on Android Chrome: look for the **Install** prompt that appears automatically.
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── login/              # Login page
+│   ├── admin/              # Admin pages (protected)
+│   │   ├── page.tsx        # Dashboard
+│   │   ├── players/        # Player management
+│   │   ├── payments/       # Monthly collections
+│   │   ├── expenses/       # Expense tracking
+│   │   ├── reports/        # Reports + CSV export
+│   │   ├── announcements/  # Team announcements
+│   │   └── settings/       # Admin profile
+│   └── player/             # Player pages (protected)
+│       ├── page.tsx        # Player dashboard
+│       ├── payments/       # Payment history
+│       ├── team/           # Team summary
+│       ├── announcements/  # View announcements
+│       └── profile/        # Profile + logout
+├── components/
+│   ├── ui/                 # Reusable UI primitives
+│   ├── layout/             # Navigation + headers
+│   ├── admin/              # Admin-specific components
+│   └── player/             # Player-specific components
+├── lib/
+│   ├── supabase/           # Supabase client (browser + server)
+│   └── utils/              # Formatting + utilities
+└── types/                  # TypeScript types
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Database Schema
 
-## Deploy on Vercel
+See `supabase/schema.sql` for full schema including:
+- `profiles` — user roles and info
+- `players` — team player records
+- `payments` — monthly payment tracking
+- `payment_logs` — audit trail
+- `expenses` — team expenses
+- `announcements` — team updates
+- `transactions` — activity ledger
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Row Level Security (RLS) is enabled — admins see all data, players only see their own.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy to Vercel
+
+1. Push to GitHub
+2. Import in [Vercel](https://vercel.com)
+3. Add environment variables
+4. Deploy
+
+## PWA Icons
+
+Replace the placeholder icons in `public/icons/` with real PNGs:
+- `icon-192.png` — 192×192px
+- `icon-512.png` — 512×512px
+- `apple-touch-icon.png` — 180×180px
+
+Use `public/icons/icon.svg` as the source.
+
+## Default Monthly Fee
+
+NPR 1,000 per player per month. Change in `players.monthly_fee` per player or update the default in `schema.sql`.
