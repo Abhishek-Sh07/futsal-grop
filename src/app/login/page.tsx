@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from '@/components/ui/Toast';
 import { Eye, EyeOff, User, Lock } from 'lucide-react';
-import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,13 +49,11 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-8">
         {/* Logo */}
         <div className="w-28 h-28 rounded-3xl bg-white flex items-center justify-center mb-6 shadow-2xl overflow-hidden">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo.png"
             alt="Koteshwor Veteran Club"
-            width={112}
-            height={112}
             className="object-contain w-full h-full"
-            priority
           />
         </div>
 
