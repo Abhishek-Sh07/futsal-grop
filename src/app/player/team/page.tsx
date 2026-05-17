@@ -3,20 +3,44 @@ import { Header } from '@/components/layout/Header';
 import { TeamSummaryClient } from '@/components/player/TeamSummaryClient';
 import { getCurrentMonthYear } from '@/lib/utils/format';
 
-export default async function TeamSummaryPage() {
-  const supabase = await createClient();
-  const { month, year } = getCurrentMonthYear();
+export default async function TeamSummaryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}) {
+  const sp = await searchParams;
+  const { month: curMonth, year: curYear } = getCurrentMonthYear();
+  const month = Number(sp.month || curMonth);
+  const year = Number(sp.year || curYear);
 
-  const [{ data: players }, { data: payments }, { data: expenses }, { data: profiles }] = await Promise.all([
+  const supabase = await createClient();
+
+  const [{ data: players }, { data: payments }, { data: allPayments }, { data: expenses }, { data: profiles }] = await Promise.all([
     supabase.from('players').select('id, full_name, status, monthly_fee').eq('status', 'active').order('full_name'),
     supabase.from('payments').select('player_id, paid_amount, amount_due, status, remaining_amount').eq('month', month).eq('year', year),
+    supabase.from('payments').select('month, year, paid_amount, status'),
     supabase.from('expenses').select('amount, category, expense_date'),
     supabase.from('player_profiles').select('player_id, photo_url'),
   ]);
 
   const paymentMap = new Map((payments || []).map(p => [p.player_id, p]));
-  const allPayments = await supabase.from('payments').select('paid_amount');
-  const totalEver = (allPayments.data || []).reduce((s, p) => s + p.paid_amount, 0);
+
+  // Monthly history: group all payments by month+year
+  const historyMap = new Map<string, { month: number; year: number; total: number; paidCount: number }>();
+  for (const p of allPayments || []) {
+    const key = `${p.year}-${p.month}`;
+    const existing = historyMap.get(key);
+    if (existing) {
+      existing.total += p.paid_amount;
+      if (p.status === 'paid' || p.status === 'overpaid') existing.paidCount++;
+    } else {
+      historyMap.set(key, { month: p.month, year: p.year, total: p.paid_amount, paidCount: (p.status === 'paid' || p.status === 'overpaid') ? 1 : 0 });
+    }
+  }
+  const monthlyHistory = Array.from(historyMap.values())
+    .sort((a, b) => b.year - a.year || b.month - a.month);
+
+  const totalEver = (allPayments || []).reduce((s, p) => s + p.paid_amount, 0);
   const totalExpensesEver = (expenses || []).reduce((s, e) => s + e.amount, 0);
   const teamBalance = totalEver - totalExpensesEver;
 
@@ -39,6 +63,7 @@ export default async function TeamSummaryPage() {
         players={players || []}
         paymentMap={paymentMap}
         photoMap={photoMap}
+        monthlyHistory={monthlyHistory}
         teamBalance={teamBalance}
         monthCollected={monthCollected}
         monthTarget={monthTarget}
