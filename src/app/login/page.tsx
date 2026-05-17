@@ -22,11 +22,20 @@ export default function LoginPage() {
     }
     setLoading(true);
     const supabase = createClient();
-    // If it looks like a phone number (only digits), convert to phone@futsal.local
-    const email = /^\d+$/.test(value) ? `${value}@futsal.local` : value;
+
+    let email = value;
+    const isPhone = /^\d+$/.test(value.replace(/[\s\-+]/g, ''));
+
+    if (isPhone) {
+      const cleanPhone = value.replace(/[\s\-+]/g, '');
+      // Look up the player's email from their phone number
+      const { data: foundEmail } = await supabase.rpc('get_email_by_phone', { phone_input: cleanPhone });
+      email = foundEmail || `${cleanPhone}@futsal.local`;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      toast.error('Wrong email/phone or password');
+      toast.error('Wrong phone/email or password');
       setLoading(false);
       return;
     }
