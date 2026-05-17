@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Player } from '@/types';
 import { formatNPR, formatMonthYear } from '@/lib/utils/format';
@@ -121,7 +122,7 @@ export function TeamSummaryClient({
             const photo = photoMap.get(player.id);
             const status = (payment?.status || 'unpaid') as 'paid' | 'unpaid' | 'partial' | 'overpaid';
             return (
-              <div key={player.id} className="px-4 py-3 flex items-center gap-3">
+              <Link key={player.id} href={`/player/team/${player.id}`} className="px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-alt)] transition-colors">
                 <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 overflow-hidden relative">
                   {photo ? (
                     <Image src={photo} alt={player.full_name} fill className="object-cover object-top" />
@@ -130,13 +131,11 @@ export function TeamSummaryClient({
                   )}
                 </div>
                 <p className="flex-1 text-sm text-[var(--color-charcoal)] truncate">{player.full_name}</p>
-                <div className="flex flex-col items-end gap-0.5">
+                <div className="flex items-center gap-2">
                   <PaymentBadge status={status} size="sm" />
-                  {payment && payment.paid_amount > 0 && (
-                    <span className="text-[10px] text-[var(--color-muted)]">{formatNPR(payment.paid_amount)}</span>
-                  )}
+                  <ChevronRight size={14} className="text-[var(--color-muted)]" />
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
