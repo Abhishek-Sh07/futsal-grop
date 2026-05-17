@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { Share2, Download, Star } from 'lucide-react';
+import { Share2, Download } from 'lucide-react';
 import { Player, PlayerProfile, TeamSettings, RatingBreakdown } from '@/types';
 
 const DEFAULT_TEAM: TeamSettings = {
@@ -34,28 +34,20 @@ interface DynamicPlayerCardProps {
   showActions?: boolean;
 }
 
-function StarRating({ rating, color }: { rating: number; color: string }) {
-  const stars = Math.round((rating / 99) * 5);
+function Stars({ rating, color }: { rating: number; color: string }) {
+  const filled = Math.round((rating / 99) * 5);
   return (
-    <div className="flex gap-0.5">
+    <div className="flex gap-0.5 justify-center mt-1">
       {[1, 2, 3, 4, 5].map(i => (
-        <Star
-          key={i}
-          size={8}
-          fill={i <= stars ? color : 'transparent'}
-          stroke={color}
-          strokeWidth={1.5}
-        />
+        <svg key={i} width="10" height="10" viewBox="0 0 24 24">
+          <polygon
+            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+            fill={i <= filled ? color : 'transparent'}
+            stroke={color}
+            strokeWidth="2"
+          />
+        </svg>
       ))}
-    </div>
-  );
-}
-
-function StatBox({ label, value, accent }: { label: string; value: string | number; accent: string }) {
-  return (
-    <div className="flex flex-col items-center gap-0.5">
-      <span className="text-[10px] font-black tracking-widest" style={{ color: accent }}>{label}</span>
-      <span className="text-base font-black text-white leading-none">{value}</span>
     </div>
   );
 }
@@ -78,7 +70,7 @@ export function DynamicPlayerCard({
   const firstName = nameParts.slice(0, -1).join(' ') || displayName;
   const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
   const position = profile?.preferred_position || (stats.isGoalkeeper ? 'GK' : 'FW');
-  const jerseyNum = profile?.jersey_number || '?';
+  const jerseyNum = (profile?.jersey_number || '?').padStart(2, '0');
   const foot = profile?.strong_foot || 'Right';
 
   const statsRow = stats.isGoalkeeper
@@ -119,76 +111,43 @@ export function DynamicPlayerCard({
     }
   }, [player.full_name, t.team_name, rating, stats]);
 
+  // ── Chip variant ──────────────────────────────────────────────
   if (variant === 'chip') {
     return (
-      <div
-        className="flex items-center gap-2 rounded-xl px-3 py-2"
-        style={{ background: t.secondary_color }}
-      >
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black text-white shrink-0"
-          style={{ background: t.primary_color }}
-        >
+      <div className="flex items-center gap-2 rounded-xl px-3 py-2" style={{ background: t.secondary_color }}>
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black text-white shrink-0" style={{ background: t.primary_color }}>
           {jerseyNum}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-bold text-white truncate">{displayName}</p>
           <p className="text-[10px]" style={{ color: t.accent_color }}>{position}</p>
         </div>
-        {!rating.isNewPlayer && (
-          <span className="text-sm font-black text-white">{rating.finalRating}</span>
-        )}
+        {!rating.isNewPlayer && <span className="text-sm font-black text-white">{rating.finalRating}</span>}
       </div>
     );
   }
 
+  // ── Compact variant ───────────────────────────────────────────
   if (variant === 'compact') {
     return (
-      <div
-        className="rounded-2xl overflow-hidden relative"
-        style={{ background: `linear-gradient(135deg, ${t.secondary_color} 0%, #0d1d2e 100%)` }}
-      >
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `radial-gradient(ellipse at 70% 50%, ${t.primary_color} 0%, transparent 70%)`,
-          }}
-        />
+      <div className="rounded-2xl overflow-hidden relative" style={{ background: `linear-gradient(135deg, ${t.secondary_color} 0%, #0d1d2e 100%)` }}>
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(ellipse at 70% 50%, ${t.primary_color} 0%, transparent 70%)` }} />
         <div className="relative p-4 flex items-center gap-4">
-          {/* Jersey + photo */}
-          <div className="relative shrink-0">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white overflow-hidden"
-              style={{ background: `linear-gradient(135deg, ${t.primary_color}, ${t.accent_color})` }}
-            >
-              {profile?.photo_url ? (
-                <Image src={profile.photo_url} alt={player.full_name} fill className="object-cover" />
-              ) : (
-                player.full_name.charAt(0)
-              )}
-            </div>
-            <div
-              className="absolute -bottom-1 -right-1 text-[10px] font-black text-white w-5 h-5 rounded-full flex items-center justify-center"
-              style={{ background: t.primary_color }}
-            >
-              {jerseyNum}
-            </div>
+          <div className="relative shrink-0 w-16 h-16 rounded-2xl overflow-hidden" style={{ background: `linear-gradient(135deg, ${t.primary_color}, ${t.accent_color})` }}>
+            {profile?.photo_url ? (
+              <Image src={profile.photo_url} alt={player.full_name} fill className="object-cover object-top" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-2xl font-black text-white">{player.full_name.charAt(0)}</div>
+            )}
           </div>
-          {/* Info */}
           <div className="flex-1 min-w-0">
             <p className="text-white font-black text-sm leading-tight truncate">{firstName}</p>
             {lastName && <p className="font-black text-sm leading-tight truncate" style={{ color: t.accent_color }}>{lastName}</p>}
             <div className="flex items-center gap-2 mt-1">
-              <span
-                className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                style={{ background: `${t.primary_color}33`, color: t.accent_color }}
-              >
-                {position}
-              </span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: `${t.primary_color}33`, color: t.accent_color }}>{position}</span>
               <span className="text-[10px] text-white/60">{foot} foot</span>
             </div>
           </div>
-          {/* Rating */}
           <div className="text-right shrink-0">
             {rating.isNewPlayer ? (
               <span className="text-[10px] text-white/50">NEW</span>
@@ -204,168 +163,186 @@ export function DynamicPlayerCard({
     );
   }
 
-  // full / shareable
-  const cardWidth = variant === 'shareable' ? 360 : undefined;
-
+  // ── Full / Shareable variant ──────────────────────────────────
   return (
     <div className="space-y-3">
       <div
         ref={cardRef}
         className="relative overflow-hidden rounded-3xl select-none"
         style={{
-          width: cardWidth,
-          background: `linear-gradient(160deg, ${t.secondary_color} 0%, #0a1520 60%, #060e18 100%)`,
           aspectRatio: '3/4',
+          background: t.secondary_color,
+          boxShadow: `0 0 0 2px ${t.primary_color}66, 0 0 40px ${t.primary_color}33, 0 20px 60px rgba(0,0,0,0.8)`,
         }}
       >
-        {/* Background glow */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(ellipse at 50% 80%, ${t.primary_color}44 0%, transparent 65%)`,
-          }}
-        />
-
-        {/* Top diagonal stripe */}
-        <div
-          className="absolute top-0 right-0 w-3/4 h-32 opacity-20"
-          style={{
-            background: `linear-gradient(135deg, transparent 40%, ${t.primary_color} 100%)`,
-          }}
-        />
-
-        {/* Background logo watermark */}
-        {t.logo_url && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-5">
-            <Image src={t.logo_url} alt="" width={200} height={200} className="object-contain" />
+        {/* ── Full-bleed player photo ── */}
+        {profile?.photo_url ? (
+          <div className="absolute inset-0">
+            <Image
+              src={profile.photo_url}
+              alt={player.full_name}
+              fill
+              className="object-cover object-top"
+              priority
+            />
+          </div>
+        ) : (
+          /* No photo: show gradient background with initial */
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ background: `linear-gradient(160deg, ${t.secondary_color} 0%, #0a1520 100%)` }}
+          >
+            <span className="font-black select-none" style={{ fontSize: '10rem', color: `${t.primary_color}20` }}>
+              {player.full_name.charAt(0)}
+            </span>
           </div>
         )}
 
-        {/* Top row: jersey # and rating */}
+        {/* ── Top dark vignette ── */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 35%, rgba(0,0,0,0.0) 55%, rgba(0,0,0,0.75) 75%, rgba(0,0,0,0.95) 100%)' }}
+        />
+
+        {/* ── Red diagonal light sweep ── */}
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{ background: `linear-gradient(135deg, transparent 30%, ${t.primary_color} 60%, transparent 80%)` }}
+        />
+
+        {/* ── Watermark text arc (SVG) ── */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+          <svg viewBox="0 0 300 300" width="90%" height="90%">
+            <defs>
+              <path id="arc" d="M 20,150 A 130,130 0 0,1 280,150" />
+            </defs>
+            <text fontFamily="Arial Black, sans-serif" fontWeight="900" fontSize="28" fill="white" letterSpacing="6">
+              <textPath href="#arc" startOffset="50%" textAnchor="middle">
+                {t.team_name.toUpperCase()}
+              </textPath>
+            </text>
+          </svg>
+        </div>
+
+        {/* ── Red card border glow (inner) ── */}
+        <div
+          className="absolute inset-0 rounded-3xl pointer-events-none"
+          style={{ boxShadow: `inset 0 0 0 1.5px ${t.primary_color}88` }}
+        />
+
+        {/* ── TOP ROW: Jersey # (left) + Rating box (right) ── */}
         <div className="absolute top-5 left-5 right-5 flex items-start justify-between z-10">
           {/* Jersey number */}
           <div>
             <p
-              className="text-6xl font-black leading-none"
+              className="font-black leading-none tracking-tighter"
               style={{
-                color: 'transparent',
-                WebkitTextStroke: `2px ${t.primary_color}`,
-                textShadow: `0 0 20px ${t.primary_color}66`,
+                fontSize: '4.5rem',
+                color: 'white',
+                textShadow: `0 0 30px ${t.primary_color}, 2px 2px 0px rgba(0,0,0,0.8)`,
+                letterSpacing: '-2px',
               }}
             >
               {jerseyNum}
             </p>
+            {/* Red line under jersey number */}
+            <div className="h-0.5 w-10 mt-1 rounded-full" style={{ background: t.primary_color }} />
           </div>
 
-          {/* Rating */}
-          <div className="flex flex-col items-center">
+          {/* Rating box */}
+          <div
+            className="flex flex-col items-center px-4 py-2.5 rounded-xl"
+            style={{
+              background: 'rgba(0,0,0,0.6)',
+              border: `1.5px solid ${t.primary_color}88`,
+              backdropFilter: 'blur(8px)',
+              minWidth: 72,
+            }}
+          >
+            <p className="text-[10px] font-black tracking-widest" style={{ color: t.accent_color }}>RATING</p>
             {rating.isNewPlayer ? (
-              <span className="text-xs font-bold text-white/40 bg-white/10 px-2 py-1 rounded-lg">NEW PLAYER</span>
+              <p className="text-sm font-black text-white/50 mt-1">NEW</p>
             ) : (
-              <>
-                <p className="text-4xl font-black text-white leading-none">{rating.finalRating}</p>
-                <p className="text-[9px] font-black tracking-widest mt-0.5" style={{ color: t.accent_color }}>RATING</p>
-                <StarRating rating={rating.finalRating} color={t.accent_color} />
-              </>
+              <p className="text-4xl font-black text-white leading-none mt-0.5">{rating.finalRating}</p>
             )}
+            <Stars rating={rating.isNewPlayer ? 0 : rating.finalRating} color={t.accent_color} />
           </div>
         </div>
 
-        {/* Left badges: position + foot */}
-        <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
-          <div
-            className="px-2.5 py-1.5 rounded-xl"
-            style={{ background: `${t.primary_color}cc`, backdropFilter: 'blur(4px)' }}
-          >
-            <p className="text-xs font-black text-white tracking-wider">{position}</p>
-          </div>
-          <div className="px-2 py-1 rounded-xl bg-white/10 backdrop-blur">
-            <p className="text-[10px] font-bold text-white/80">{foot[0]}F</p>
-          </div>
-        </div>
-
-        {/* Player photo / avatar — centered */}
-        <div className="absolute inset-0 flex items-center justify-center z-0">
-          <div
-            className="relative flex items-end justify-center overflow-hidden"
-            style={{ width: '65%', height: '65%' }}
-          >
-            {profile?.photo_url ? (
-              <>
-                <Image
-                  src={profile.photo_url}
-                  alt={player.full_name}
-                  fill
-                  className="object-cover object-top"
-                  style={{ maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)' }}
-                />
-              </>
-            ) : (
-              <div className="flex items-center justify-center w-full h-full">
-                <span
-                  className="font-black"
-                  style={{
-                    fontSize: '6rem',
-                    color: `${t.primary_color}33`,
-                  }}
-                >
-                  {player.full_name.charAt(0)}
-                </span>
+        {/* ── LEFT SIDE: Position + Strong Foot ── */}
+        <div className="absolute left-5 z-10" style={{ top: '38%' }}>
+          <div className="flex flex-col gap-3">
+            {/* Position */}
+            <div>
+              <p className="text-[9px] font-black tracking-widest text-white/60 mb-1">POSITION</p>
+              <div
+                className="px-3 py-1.5 rounded-lg"
+                style={{
+                  background: 'rgba(0,0,0,0.55)',
+                  border: `1.5px solid ${t.primary_color}`,
+                  backdropFilter: 'blur(4px)',
+                }}
+              >
+                <p className="text-sm font-black text-white tracking-wider">{position}</p>
               </div>
-            )}
-            {/* Bottom gradient fade over photo */}
-            <div
-              className="absolute bottom-0 left-0 right-0 h-1/3"
-              style={{ background: `linear-gradient(to top, #060e18, transparent)` }}
-            />
+            </div>
+
+            {/* Strong foot */}
+            <div>
+              <p className="text-[9px] font-black tracking-widest text-white/60 mb-1">STRONG FOOT</p>
+              <div className="flex items-center gap-1.5">
+                {/* Boot icon */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white" opacity="0.9">
+                  <path d="M19.5 12.5c0 .83-.34 1.58-.88 2.12L16 17.24V21H8v-3l-2-2v-3c0-.55.45-1 1-1h1.5L10 9.5V7c0-1.1.9-2 2-2s2 .9 2 2v2.5l1.5 2.5H18c.83 0 1.5.67 1.5 1.5z"/>
+                </svg>
+                <p className="text-sm font-bold text-white">{foot} Foot</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Bottom section */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5">
+        {/* ── BOTTOM SECTION ── */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-4">
           {/* Player name */}
           <div className="mb-2">
-            <p className="text-2xl font-black text-white leading-tight tracking-wide uppercase">{firstName}</p>
+            <p
+              className="font-black uppercase leading-tight tracking-wide"
+              style={{ fontSize: '1.75rem', color: 'white', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+            >
+              {firstName}
+            </p>
             {lastName && (
               <p
-                className="text-2xl font-black leading-tight tracking-wide uppercase"
-                style={{ color: t.accent_color }}
+                className="font-black uppercase leading-none tracking-wide"
+                style={{ fontSize: '2.4rem', color: t.accent_color, textShadow: `0 0 20px ${t.primary_color}88, 0 2px 8px rgba(0,0,0,0.8)` }}
               >
                 {lastName}
               </p>
             )}
           </div>
 
-          {/* Team name with decorative lines */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className="h-px flex-1 opacity-40" style={{ background: t.accent_color }} />
+          {/* Team name with lines */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${t.accent_color}88)` }} />
             <p className="text-[9px] font-black tracking-[0.2em] text-white/70 uppercase">{t.team_name}</p>
-            <div className="h-px flex-1 opacity-40" style={{ background: t.accent_color }} />
+            <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${t.accent_color}88)` }} />
           </div>
 
-          {/* Stats grid */}
+          {/* Stats row */}
           <div
-            className="rounded-2xl p-3 grid gap-2"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              backdropFilter: 'blur(8px)',
-              gridTemplateColumns: `repeat(${statsRow.length}, 1fr)`,
-            }}
+            className="rounded-2xl overflow-hidden"
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            {statsRow.map((s, i) => (
-              <StatBox key={i} label={s.label} value={s.value} accent={t.accent_color} />
-            ))}
+            <div className="grid divide-x" style={{ gridTemplateColumns: `repeat(${statsRow.length}, 1fr)`, borderColor: 'rgba(255,255,255,0.08)' }}>
+              {statsRow.map((s, i) => (
+                <div key={i} className="flex flex-col items-center py-3 gap-1">
+                  <p className="text-[9px] font-black tracking-widest" style={{ color: t.accent_color }}>{s.label}</p>
+                  <p className="text-xl font-black text-white leading-none">{s.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-
-        {/* Decorative corner accent */}
-        <div
-          className="absolute bottom-0 right-0 w-24 h-24 opacity-30"
-          style={{
-            background: `conic-gradient(from 225deg, ${t.primary_color}, transparent)`,
-            clipPath: 'polygon(100% 0, 100% 100%, 0 100%)',
-          }}
-        />
       </div>
 
       {/* Action buttons */}
@@ -381,8 +358,8 @@ export function DynamicPlayerCard({
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
-            style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.15)' }}
+            className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white transition-opacity active:opacity-70 disabled:opacity-50"
+            style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}
           >
             <Download size={16} /> {exporting ? 'Saving…' : 'Save PNG'}
           </button>
