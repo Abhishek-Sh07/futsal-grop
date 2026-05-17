@@ -24,11 +24,11 @@ const ADMIN_NAV: NavItem[] = [
 ];
 
 const PLAYER_NAV: NavItem[] = [
-  { href: '/player',                label: 'Home',        icon: <Home size={22} /> },
-  { href: '/player/payments',       label: 'My Payments', icon: <Wallet size={22} /> },
-  { href: '/player/team',           label: 'Team',        icon: <Globe size={22} /> },
-  { href: '/player/announcements',  label: 'Updates',     icon: <Megaphone size={22} /> },
-  { href: '/player/profile',        label: 'Profile',     icon: <User size={22} /> },
+  { href: '/player',                label: 'Home',        icon: <Home size={20} /> },
+  { href: '/player/payments',       label: 'Payments',    icon: <Wallet size={20} /> },
+  { href: '/player/formations',     label: 'Lineup',      icon: <Layers size={20} /> },
+  { href: '/player/announcements',  label: 'Updates',     icon: <Megaphone size={20} /> },
+  { href: '/player/profile',        label: 'Profile',     icon: <User size={20} /> },
 ];
 
 interface BottomNavProps {

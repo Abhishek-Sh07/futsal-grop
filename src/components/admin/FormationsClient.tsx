@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Formation, FormationPlayer, MatchType } from '@/types';
 import { formatDate } from '@/lib/utils/format';
@@ -22,6 +22,8 @@ const MATCH_TYPE_LABEL: Record<MatchType, string> = { '5v5': '5-a-side', '7v7': 
 
 export function FormationsClient({ formations }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname.startsWith('/player') ? '/player/formations' : '/admin/formations';
   const [deleteTarget, setDeleteTarget] = useState<FormationWithPlayers | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -74,7 +76,7 @@ export function FormationsClient({ formations }: Props) {
   return (
     <div className="px-4 pt-4 space-y-4">
       <div className="flex justify-end">
-        <Link href="/admin/formations/new">
+        <Link href={`${basePath}/new`}>
           <Button leftIcon={<Plus size={16} />}>New Lineup</Button>
         </Link>
       </div>
@@ -85,7 +87,7 @@ export function FormationsClient({ formations }: Props) {
           title="No lineups yet"
           description="Create your first formation to get started"
           action={
-            <Link href="/admin/formations/new">
+            <Link href={`${basePath}/new`}>
               <Button leftIcon={<Plus size={16} />}>New Lineup</Button>
             </Link>
           }
@@ -117,7 +119,7 @@ export function FormationsClient({ formations }: Props) {
 
                 <div className="grid grid-cols-4 gap-2 pt-3 border-t border-[var(--color-border)]">
                   <Link
-                    href={`/admin/formations/${f.id}`}
+                    href={`${basePath}/${f.id}`}
                     className="flex flex-col items-center gap-1 py-2 rounded-xl hover:bg-[var(--color-surface-alt)] transition-colors text-[var(--color-primary)]"
                   >
                     <Pencil size={16} />

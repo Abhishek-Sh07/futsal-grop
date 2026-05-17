@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Formation, FormationPlayer, MatchType, Player, PlayerRole } from '@/types';
 import { cn } from '@/lib/utils/format';
 import { toast } from '@/components/ui/Toast';
@@ -55,6 +55,8 @@ const PITCH_TOKEN_COLORS: Record<PlayerRole, string> = {
 
 export function FormationBuilderClient({ formation, formationPlayers, players }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname.startsWith('/player') ? '/player/formations' : '/admin/formations';
   const pitchRef = useRef<HTMLDivElement>(null);
 
   const [name, setName] = useState(formation?.name ?? '');
@@ -192,7 +194,7 @@ export function FormationBuilderClient({ formation, formationPlayers, players }:
 
     toast.success('Lineup saved!');
     setSaving(false);
-    router.push('/admin/formations');
+    router.push(basePath);
     router.refresh();
   };
 
