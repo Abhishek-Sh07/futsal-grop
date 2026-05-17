@@ -10,6 +10,7 @@ import { RatingBreakdownCard, PaymentReliabilityCard } from '@/components/ui/Pla
 import { DynamicPlayerCard } from '@/components/ui/DynamicPlayerCard';
 import { PlayerStatsEditor } from '@/components/admin/PlayerStatsEditor';
 import { PlayerProfileEditor } from '@/components/admin/PlayerProfileEditor';
+import { SetPlayerPasswordButton } from '@/components/admin/SetPlayerPasswordButton';
 import Image from 'next/image';
 import { Phone, Mail, Calendar, Wallet, TrendingUp, AlertCircle } from 'lucide-react';
 
@@ -105,6 +106,9 @@ export function PlayerDetailClient({ player, payments, totalPaid, totalPending, 
               <div className="flex items-center gap-2 text-sm text-[var(--color-muted)]"><Calendar size={14} /><span>Joined {formatDate(player.joined_date)}</span></div>
               <div className="flex items-center gap-2 text-sm text-[var(--color-muted)]"><Wallet size={14} /><span>Monthly fee: {formatNPR(player.monthly_fee)}</span></div>
               {player.notes && <p className="text-xs text-[var(--color-muted)] bg-[var(--color-surface-alt)] rounded-xl p-2.5 mt-2">{player.notes}</p>}
+            </div>
+            <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
+              <SetPlayerPasswordButton playerId={player.id} playerName={player.full_name} />
             </div>
           </Card>
 
