@@ -4,28 +4,29 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from '@/components/ui/Toast';
-import { Eye, EyeOff, Phone, Lock } from 'lucide-react';
+import { Eye, EyeOff, User, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [phone, setPhone] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const digits = phone.replace(/\D/g, '');
-    if (!digits || !password) {
-      toast.error('Please enter phone number and password');
+    const value = identifier.trim();
+    if (!value || !password) {
+      toast.error('Please enter your email or phone and password');
       return;
     }
     setLoading(true);
     const supabase = createClient();
-    const email = `${digits}@futsal.local`;
+    // If it looks like a phone number (only digits), convert to phone@futsal.local
+    const email = /^\d+$/.test(value) ? `${value}@futsal.local` : value;
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      toast.error('Wrong phone number or password');
+      toast.error('Wrong email/phone or password');
       setLoading(false);
       return;
     }
@@ -54,19 +55,19 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="bg-white rounded-3xl shadow-2xl p-6 space-y-4">
             <h2 className="text-xl font-bold text-[var(--color-charcoal)] mb-5">Sign in to your account</h2>
 
-            {/* Phone */}
+            {/* Email or Phone */}
             <div>
-              <label className="block text-sm font-semibold text-[var(--color-charcoal)] mb-1.5">Phone Number</label>
+              <label className="block text-sm font-semibold text-[var(--color-charcoal)] mb-1.5">Email or Phone Number</label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]">
-                  <Phone size={16} />
+                  <User size={16} />
                 </span>
                 <input
-                  type="tel"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  placeholder="98XXXXXXXX"
-                  autoComplete="tel"
+                  type="text"
+                  value={identifier}
+                  onChange={e => setIdentifier(e.target.value)}
+                  placeholder="you@gmail.com or 98XXXXXXXX"
+                  autoComplete="username"
                   className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] text-sm pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-all placeholder:text-gray-400"
                 />
               </div>
