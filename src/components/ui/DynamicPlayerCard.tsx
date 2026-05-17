@@ -187,14 +187,19 @@ export function DynamicPlayerCard({
             />
           </div>
         ) : (
-          /* No photo: show gradient background with initial */
+          /* No photo: gradient bg with logo watermark */
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{ background: `linear-gradient(160deg, ${t.secondary_color} 0%, #0a1520 100%)` }}
           >
-            <span className="font-black select-none" style={{ fontSize: '10rem', color: `${t.primary_color}20` }}>
-              {player.full_name.charAt(0)}
-            </span>
+            <Image
+              src={t.logo_url || '/logo.png'}
+              alt=""
+              width={220}
+              height={220}
+              className="object-contain opacity-10"
+              style={{ mixBlendMode: 'screen' }}
+            />
           </div>
         )}
 
@@ -203,6 +208,18 @@ export function DynamicPlayerCard({
           className="absolute inset-0"
           style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 35%, rgba(0,0,0,0.0) 55%, rgba(0,0,0,0.75) 75%, rgba(0,0,0,0.95) 100%)' }}
         />
+
+        {/* ── Logo watermark (center, behind everything) ── */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
+          <Image
+            src={t.logo_url || '/logo.png'}
+            alt=""
+            width={180}
+            height={180}
+            className="object-contain opacity-[0.07]"
+            style={{ mixBlendMode: 'screen' }}
+          />
+        </div>
 
         {/* ── Red diagonal light sweep ── */}
         <div

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from '@/components/ui/Toast';
 import { Eye, EyeOff, User, Lock } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,13 +48,16 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[var(--color-primary)] flex flex-col">
       {/* Hero section */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-8">
-        {/* Logo mark */}
-        <div className="w-20 h-20 rounded-3xl bg-white/15 border border-white/20 flex items-center justify-center mb-6 shadow-2xl">
-          <svg viewBox="0 0 48 48" fill="none" className="w-12 h-12" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="24" cy="24" r="22" stroke="white" strokeWidth="2.5" fill="none" />
-            <path d="M24 8 L28 18 L38 18 L30 25 L33 35 L24 28 L15 35 L18 25 L10 18 L20 18 Z" fill="white" opacity="0.9" />
-            <path d="M24 8 L24 28 M15 35 L28 18 M33 35 L20 18 M10 18 L33 18 M18 25 L30 25" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
+        {/* Logo */}
+        <div className="w-28 h-28 rounded-3xl bg-white flex items-center justify-center mb-6 shadow-2xl overflow-hidden">
+          <Image
+            src="/logo.png"
+            alt="Koteshwor Veteran Club"
+            width={112}
+            height={112}
+            className="object-contain w-full h-full"
+            priority
+          />
         </div>
 
         <h1 className="text-3xl font-bold text-white mb-1">Futsal Hisab</h1>
