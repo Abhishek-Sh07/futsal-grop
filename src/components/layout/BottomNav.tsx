@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, CreditCard, Receipt, BarChart3,
-  Home, Wallet, Globe, Megaphone, User, Layers
+  Home, Wallet, Globe, Megaphone, User, Layers, UsersRound
 } from 'lucide-react';
 import { cn } from '@/lib/utils/format';
 
@@ -27,7 +27,7 @@ const PLAYER_NAV: NavItem[] = [
   { href: '/player',                label: 'Home',        icon: <Home size={20} /> },
   { href: '/player/payments',       label: 'Payments',    icon: <Wallet size={20} /> },
   { href: '/player/formations',     label: 'Lineup',      icon: <Layers size={20} /> },
-  { href: '/player/announcements',  label: 'Updates',     icon: <Megaphone size={20} /> },
+  { href: '/player/team',           label: 'Team',        icon: <UsersRound size={20} /> },
   { href: '/player/profile',        label: 'Profile',     icon: <User size={20} /> },
 ];
 
