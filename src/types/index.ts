@@ -144,3 +144,25 @@ export const PAYMENT_METHODS: Record<PaymentMethod, string> = {
   bank_transfer: 'Bank Transfer',
   other: 'Other',
 };
+
+export type MatchType = '5v5' | '7v7';
+export type PlayerRole = 'starter' | 'substitute' | 'unavailable';
+
+export interface Formation {
+  id: string;
+  name: string;
+  match_type: MatchType;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FormationPlayer {
+  id: string;
+  formation_id: string;
+  player_id: string;
+  role: PlayerRole;
+  position_x: number | null;
+  position_y: number | null;
+}

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, CreditCard, Receipt, BarChart3,
-  Home, Wallet, Globe, Megaphone, User
+  Home, Wallet, Globe, Megaphone, User, Layers
 } from 'lucide-react';
 import { cn } from '@/lib/utils/format';
 
@@ -15,11 +15,12 @@ interface NavItem {
 }
 
 const ADMIN_NAV: NavItem[] = [
-  { href: '/admin',           label: 'Dashboard', icon: <LayoutDashboard size={22} /> },
-  { href: '/admin/payments',  label: 'Payments',  icon: <CreditCard size={22} /> },
-  { href: '/admin/players',   label: 'Players',   icon: <Users size={22} /> },
-  { href: '/admin/expenses',  label: 'Expenses',  icon: <Receipt size={22} /> },
-  { href: '/admin/reports',   label: 'Reports',   icon: <BarChart3 size={22} /> },
+  { href: '/admin',              label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+  { href: '/admin/payments',     label: 'Payments',  icon: <CreditCard size={20} /> },
+  { href: '/admin/players',      label: 'Players',   icon: <Users size={20} /> },
+  { href: '/admin/formations',   label: 'Lineup',    icon: <Layers size={20} /> },
+  { href: '/admin/expenses',     label: 'Expenses',  icon: <Receipt size={20} /> },
+  { href: '/admin/reports',      label: 'Reports',   icon: <BarChart3 size={20} /> },
 ];
 
 const PLAYER_NAV: NavItem[] = [
