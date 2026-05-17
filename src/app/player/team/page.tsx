@@ -7,10 +7,11 @@ export default async function TeamSummaryPage() {
   const supabase = await createClient();
   const { month, year } = getCurrentMonthYear();
 
-  const [{ data: players }, { data: payments }, { data: expenses }] = await Promise.all([
+  const [{ data: players }, { data: payments }, { data: expenses }, { data: profiles }] = await Promise.all([
     supabase.from('players').select('id, full_name, status, monthly_fee').eq('status', 'active').order('full_name'),
     supabase.from('payments').select('player_id, paid_amount, amount_due, status, remaining_amount').eq('month', month).eq('year', year),
     supabase.from('expenses').select('amount, category, expense_date'),
+    supabase.from('player_profiles').select('player_id, photo_url'),
   ]);
 
   const paymentMap = new Map((payments || []).map(p => [p.player_id, p]));
@@ -27,12 +28,17 @@ export default async function TeamSummaryPage() {
   const monthCollected = (payments || []).reduce((s, p) => s + p.paid_amount, 0);
   const monthTarget = (players || []).reduce((s, p) => s + p.monthly_fee, 0);
 
+  const photoMap = new Map(
+    (profiles || []).filter(p => p.photo_url).map(p => [p.player_id, p.photo_url as string])
+  );
+
   return (
     <>
       <Header title="Team Summary" subtitle="Fund overview" />
       <TeamSummaryClient
         players={players || []}
         paymentMap={paymentMap}
+        photoMap={photoMap}
         teamBalance={teamBalance}
         monthCollected={monthCollected}
         monthTarget={monthTarget}

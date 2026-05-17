@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Player } from '@/types';
 import { formatNPR, formatMonthYear } from '@/lib/utils/format';
 import { PaymentBadge } from '@/components/ui/Badge';
@@ -11,6 +12,7 @@ type PaymentRecord = { paid_amount: number; amount_due: number; status: string; 
 interface Props {
   players: (Pick<Player, 'id' | 'full_name' | 'status' | 'monthly_fee'>)[];
   paymentMap: Map<string, PaymentRecord>;
+  photoMap: Map<string, string>;
   teamBalance: number;
   monthCollected: number;
   monthTarget: number;
@@ -20,7 +22,7 @@ interface Props {
 }
 
 export function TeamSummaryClient({
-  players, paymentMap, teamBalance, monthCollected, monthTarget, monthExpensesTotal, month, year
+  players, paymentMap, photoMap, teamBalance, monthCollected, monthTarget, monthExpensesTotal, month, year
 }: Props) {
   const paidCount = players.filter(p => paymentMap.get(p.id)?.status === 'paid').length;
   const unpaidCount = players.filter(p => !paymentMap.get(p.id) || paymentMap.get(p.id)?.status === 'unpaid').length;
@@ -86,11 +88,16 @@ export function TeamSummaryClient({
         <div className="bg-white rounded-2xl border border-[var(--color-border)] divide-y divide-[var(--color-border)]">
           {players.map(player => {
             const payment = paymentMap.get(player.id);
+            const photo = photoMap.get(player.id);
             const status = (payment?.status || 'unpaid') as 'paid' | 'unpaid' | 'partial' | 'overpaid';
             return (
               <div key={player.id} className="px-4 py-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                  <span className="text-xs font-bold text-[var(--color-primary)]">{player.full_name.charAt(0)}</span>
+                <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+                  {photo ? (
+                    <Image src={photo} alt={player.full_name} fill className="object-cover object-top" />
+                  ) : (
+                    <span className="text-xs font-bold text-[var(--color-primary)]">{player.full_name.charAt(0)}</span>
+                  )}
                 </div>
                 <p className="flex-1 text-sm text-[var(--color-charcoal)] truncate">{player.full_name}</p>
                 <PaymentBadge status={status} size="sm" />

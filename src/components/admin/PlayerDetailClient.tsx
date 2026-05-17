@@ -10,6 +10,7 @@ import { RatingBreakdownCard, PaymentReliabilityCard } from '@/components/ui/Pla
 import { DynamicPlayerCard } from '@/components/ui/DynamicPlayerCard';
 import { PlayerStatsEditor } from '@/components/admin/PlayerStatsEditor';
 import { PlayerProfileEditor } from '@/components/admin/PlayerProfileEditor';
+import Image from 'next/image';
 import { Phone, Mail, Calendar, Wallet, TrendingUp, AlertCircle } from 'lucide-react';
 
 interface Props {
@@ -77,8 +78,12 @@ export function PlayerDetailClient({ player, payments, totalPaid, totalPending, 
           {/* Profile card */}
           <Card>
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-2xl bg-[var(--color-primary)]/10 flex items-center justify-center">
-                <span className="text-2xl font-bold text-[var(--color-primary)]">{player.full_name.charAt(0)}</span>
+              <div className="w-16 h-16 rounded-2xl bg-[var(--color-primary)]/10 flex items-center justify-center overflow-hidden relative shrink-0">
+                {currentProfile?.photo_url ? (
+                  <Image src={currentProfile.photo_url} alt={player.full_name} fill className="object-cover object-top" />
+                ) : (
+                  <span className="text-2xl font-bold text-[var(--color-primary)]">{player.full_name.charAt(0)}</span>
+                )}
               </div>
               <div>
                 <h2 className="text-xl font-bold text-[var(--color-charcoal)]">{player.full_name}</h2>

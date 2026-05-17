@@ -12,6 +12,7 @@ import { Input, Select, TextArea } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
 import {
   Search, ChevronDown, CheckCircle2, MessageCircle, Copy,
   Check, Filter, CalendarDays, Wallet
@@ -30,11 +31,12 @@ const PAYMENT_FORM_INIT = {
 
 interface Props {
   merged: MergedRow[];
+  photoMap: Map<string, string>;
   month: number;
   year: number;
 }
 
-export function PaymentsClient({ merged, month, year }: Props) {
+export function PaymentsClient({ merged, photoMap, month, year }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterStatus>('all');
@@ -225,12 +227,17 @@ export function PaymentsClient({ merged, month, year }: Props) {
           const status: PaymentStatus = payment?.status || 'unpaid';
           const paidAmount = payment?.paid_amount || 0;
           const remaining = payment?.remaining_amount ?? player.monthly_fee;
+          const photo = photoMap.get(player.id);
 
           return (
             <div key={player.id} className="bg-white rounded-2xl border border-[var(--color-border)] p-4">
               <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                  <span className="text-sm font-bold text-[var(--color-primary)]">{player.full_name.charAt(0)}</span>
+                <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+                  {photo ? (
+                    <Image src={photo} alt={player.full_name} fill className="object-cover object-top" />
+                  ) : (
+                    <span className="text-sm font-bold text-[var(--color-primary)]">{player.full_name.charAt(0)}</span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-[var(--color-charcoal)] truncate">{player.full_name}</p>

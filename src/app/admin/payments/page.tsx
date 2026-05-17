@@ -15,9 +15,10 @@ export default async function PaymentsPage({
 
   const supabase = await createClient();
 
-  const [{ data: players }, { data: payments }] = await Promise.all([
+  const [{ data: players }, { data: payments }, { data: profiles }] = await Promise.all([
     supabase.from('players').select('*').eq('status', 'active').order('full_name'),
     supabase.from('payments').select('*, player:players(*)').eq('month', month).eq('year', year),
+    supabase.from('player_profiles').select('player_id, photo_url'),
   ]);
 
   // Merge: for each active player, find or create placeholder payment
@@ -26,11 +27,14 @@ export default async function PaymentsPage({
     player,
     payment: paymentMap.get(player.id) || null,
   }));
+  const photoMap = new Map(
+    (profiles || []).filter(p => p.photo_url).map(p => [p.player_id, p.photo_url as string])
+  );
 
   return (
     <>
       <Header title="Monthly Payments" subtitle={`Track contributions`} />
-      <PaymentsClient merged={merged} month={month} year={year} />
+      <PaymentsClient merged={merged} photoMap={photoMap} month={month} year={year} />
     </>
   );
 }
