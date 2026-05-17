@@ -210,19 +210,6 @@ export function DynamicPlayerCard({
           style={{ background: `linear-gradient(135deg, transparent 30%, ${t.primary_color} 60%, transparent 80%)` }}
         />
 
-        {/* ── Watermark text arc (SVG) ── */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-          <svg viewBox="0 0 300 300" width="90%" height="90%">
-            <defs>
-              <path id="arc" d="M 20,150 A 130,130 0 0,1 280,150" />
-            </defs>
-            <text fontFamily="Arial Black, sans-serif" fontWeight="900" fontSize="28" fill="white" letterSpacing="6">
-              <textPath href="#arc" startOffset="50%" textAnchor="middle">
-                {t.team_name.toUpperCase()}
-              </textPath>
-            </text>
-          </svg>
-        </div>
 
         {/* ── Red card border glow (inner) ── */}
         <div
@@ -291,9 +278,17 @@ export function DynamicPlayerCard({
             <div>
               <p className="text-[9px] font-black tracking-widest text-white/60 mb-1">STRONG FOOT</p>
               <div className="flex items-center gap-1.5">
-                {/* Boot icon */}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white" opacity="0.9">
-                  <path d="M19.5 12.5c0 .83-.34 1.58-.88 2.12L16 17.24V21H8v-3l-2-2v-3c0-.55.45-1 1-1h1.5L10 9.5V7c0-1.1.9-2 2-2s2 .9 2 2v2.5l1.5 2.5H18c.83 0 1.5.67 1.5 1.5z"/>
+                {/* Football boot icon */}
+                <svg width="22" height="22" viewBox="0 0 100 100" fill="white" opacity="0.9">
+                  {/* Shaft */}
+                  <rect x="18" y="8" width="22" height="48" rx="8"/>
+                  {/* Foot bed */}
+                  <path d="M18 50 Q18 68 28 68 L78 68 Q88 68 88 58 L88 54 Q88 44 78 44 L40 44 L40 50 Z"/>
+                  {/* Studs */}
+                  <rect x="26" y="68" width="9" height="7" rx="3"/>
+                  <rect x="42" y="68" width="9" height="7" rx="3"/>
+                  <rect x="58" y="68" width="9" height="7" rx="3"/>
+                  <rect x="72" y="68" width="9" height="7" rx="3"/>
                 </svg>
                 <p className="text-sm font-bold text-white">{foot} Foot</p>
               </div>
