@@ -209,18 +209,6 @@ export function DynamicPlayerCard({
           style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 35%, rgba(0,0,0,0.0) 55%, rgba(0,0,0,0.75) 75%, rgba(0,0,0,0.95) 100%)' }}
         />
 
-        {/* ── Logo watermark (center, behind everything) ── */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
-          <Image
-            src={t.logo_url || '/logo.png'}
-            alt=""
-            width={180}
-            height={180}
-            className="object-contain opacity-[0.07]"
-            style={{ mixBlendMode: 'screen' }}
-          />
-        </div>
-
         {/* ── Red diagonal light sweep ── */}
         <div
           className="absolute inset-0 opacity-20"
