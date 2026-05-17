@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Users, CreditCard, Receipt, BarChart3,
   Home, Wallet, Globe, Megaphone, User, Layers, UsersRound
@@ -37,36 +38,43 @@ interface BottomNavProps {
 
 export function BottomNav({ role }: BottomNavProps) {
   const pathname = usePathname();
+  const [tapped, setTapped] = useState<string | null>(null);
   const items = role === 'admin' ? ADMIN_NAV : PLAYER_NAV;
+
+  // Clear tapped state when navigation completes
+  useEffect(() => { setTapped(null); }, [pathname]);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[var(--color-border)] safe-bottom">
       <div className="flex items-stretch h-16">
         {items.map(item => {
           const isActive = pathname === item.href || (item.href !== '/admin' && item.href !== '/player' && pathname.startsWith(item.href));
+          const isTapped = tapped === item.href;
+
           return (
             <Link
               key={item.href}
               href={item.href}
+              onMouseDown={() => setTapped(item.href)}
+              onTouchStart={() => setTapped(item.href)}
               className={cn(
-                'flex-1 flex flex-col items-center justify-center gap-0.5 pt-2 pb-1 transition-all duration-150',
-                isActive
-                  ? 'text-[var(--color-primary)]'
-                  : 'text-[var(--color-muted)] hover:text-[var(--color-charcoal)]'
+                'flex-1 flex flex-col items-center justify-center gap-0.5 pt-2 pb-1 transition-all duration-100 select-none',
+                isActive ? 'text-[var(--color-primary)]' : 'text-[var(--color-muted)]',
+                isTapped && !isActive && 'text-[var(--color-primary)] scale-95 opacity-70',
               )}
             >
               <span className={cn(
-                'relative transition-transform duration-150',
-                isActive && 'scale-110'
+                'relative transition-all duration-100',
+                (isActive || isTapped) && 'scale-110'
               )}>
-                {isActive && (
+                {(isActive || isTapped) && (
                   <span className="absolute -inset-1.5 bg-[var(--color-primary)]/10 rounded-xl" />
                 )}
                 <span className="relative">{item.icon}</span>
               </span>
               <span className={cn(
-                'text-[10px] font-medium leading-none',
-                isActive && 'font-semibold'
+                'text-[10px] leading-none transition-all duration-100',
+                (isActive || isTapped) ? 'font-semibold' : 'font-medium'
               )}>
                 {item.label}
               </span>
