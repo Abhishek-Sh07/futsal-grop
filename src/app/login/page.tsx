@@ -4,26 +4,28 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from '@/components/ui/Toast';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, Phone, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error('Please enter email and password');
+    const digits = phone.replace(/\D/g, '');
+    if (!digits || !password) {
+      toast.error('Please enter phone number and password');
       return;
     }
     setLoading(true);
     const supabase = createClient();
+    const email = `${digits}@futsal.local`;
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      toast.error(error.message || 'Login failed');
+      toast.error('Wrong phone number or password');
       setLoading(false);
       return;
     }
@@ -52,19 +54,19 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="bg-white rounded-3xl shadow-2xl p-6 space-y-4">
             <h2 className="text-xl font-bold text-[var(--color-charcoal)] mb-5">Sign in to your account</h2>
 
-            {/* Email */}
+            {/* Phone */}
             <div>
-              <label className="block text-sm font-semibold text-[var(--color-charcoal)] mb-1.5">Email</label>
+              <label className="block text-sm font-semibold text-[var(--color-charcoal)] mb-1.5">Phone Number</label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]">
-                  <Mail size={16} />
+                  <Phone size={16} />
                 </span>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  autoComplete="email"
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="98XXXXXXXX"
+                  autoComplete="tel"
                   className="w-full h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] text-sm pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-all placeholder:text-gray-400"
                 />
               </div>
